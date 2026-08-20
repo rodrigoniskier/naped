@@ -69,7 +69,8 @@ export async function GET(request: Request) {
         new Paragraph('Relatório gerado automaticamente pelo Sistema NAPED.')
       ] }] });
       const buffer = await Packer.toBuffer(doc);
-      return new NextResponse(buffer, { headers: {
+      const bytes = new Uint8Array(buffer);
+      return new NextResponse(bytes, { headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'Content-Disposition': `attachment; filename="relatorio-naped-${userId}.docx"`
       }});
