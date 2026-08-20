@@ -19,6 +19,9 @@ const categories: Record<string, string[]> = {
 
 const modalities = ['Atendimento individual', 'Atendimento em grupo', 'Oficina', 'Curso/capacitação', 'Reunião técnica', 'Consultoria pedagógica', 'Produção/revisão de material', 'Observação docente', 'Reunião institucional', 'Projeto longitudinal'];
 
+const LOGO_UNIPE = 'https://raw.githubusercontent.com/rodrigoniskier/naped/main/logo.png';
+const LOGO_NAPED = 'https://raw.githubusercontent.com/rodrigoniskier/naped/main/naped.jpg';
+
 function today() { return new Date().toISOString().slice(0, 10); }
 
 export default function Home() {
@@ -93,7 +96,12 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={() => setView('home')} aria-label="Início">
-          <span className="brand-mark">N</span><span><strong>NAPED</strong><small>Educação Médica</small></span>
+          <span className="brand-logos">
+            <img src={LOGO_UNIPE} alt="UNIPÊ" className="brand-logo unipe-logo" />
+            <span className="brand-divider" aria-hidden="true" />
+            <img src={LOGO_NAPED} alt="NAPED" className="brand-logo naped-logo" />
+          </span>
+          <span className="brand-copy"><strong>NAPED</strong><small>Educação Médica</small></span>
         </button>
         <button className="user-chip" onClick={() => setProfileOpen(true)}>{selected ? selected.name : 'Escolher usuário'} <span>⌄</span></button>
       </header>
@@ -160,7 +168,15 @@ export default function Home() {
         {users.map(u => <button className={`user-option ${selected?.id===u.id?'active':''}`} key={u.id} onClick={() => {chooseUser(u);setProfileOpen(false)}}><span>{u.name.charAt(0).toUpperCase()}</span><div><b>{u.name}</b><small>{u.role || 'NAPED'}{u.institution ? ` · ${u.institution}` : ''}</small></div></button>)}
         <details open={!users.length}><summary>＋ Cadastrar novo usuário</summary><form className="mini-form" onSubmit={createUser}><label>Nome completo<input name="name" required /></label><label>Função<input name="role" placeholder="Ex.: Professor / NAPED" /></label><label>Instituição<input name="institution" placeholder="Ex.: UNIPÊ" /></label><label>E-mail <small>(opcional)</small><input name="email" type="email" /></label><button className="primary">Salvar perfil</button></form></details>
       </div></div>}
-      <footer>NAPED · Desenvolvimento Docente e Excelência Acadêmica</footer>
+      <footer className="app-footer">
+        <div className="footer-logos" aria-label="Identidade institucional">
+          <img src={LOGO_UNIPE} alt="UNIPÊ" />
+          <span aria-hidden="true" />
+          <img src={LOGO_NAPED} alt="NAPED" />
+        </div>
+        <p><strong>Criado por Prof. Rodrigo Niskier | 2026</strong></p>
+        <p className="footer-reference">Baseado em: ASSOCIAÇÃO BRASILEIRA DE EDUCAÇÃO MÉDICA (ABEM). <em>Caderno de Orientações para implementação das Diretrizes Curriculares Nacionais do Curso de Graduação em Medicina 2025</em>. Brasília, DF: Associação Brasileira de Educação Médica, 2026. ISBN 978-65-86406-22-1.</p>
+      </footer>
     </main>
   );
 }
