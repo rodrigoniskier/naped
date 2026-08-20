@@ -5,6 +5,18 @@ import { db, ensureSchema } from '@/lib/db';
 
 function safe(v: unknown) { return v == null ? '' : String(v); }
 
+function binaryResponse(data: Uint8Array, contentType: string, filename: string) {
+  const arrayBuffer = new ArrayBuffer(data.byteLength);
+  new Uint8Array(arrayBuffer).set(data);
+  const blob = new Blob([arrayBuffer], { type: contentType });
+  return new NextResponse(blob, {
+    headers: {
+      'Content-Type': contentType,
+      'Content-Disposition': `attachment; filename="${filename}"`
+    }
+  });
+}
+
 export async function GET(request: Request) {
   try {
     await ensureSchema();
@@ -69,11 +81,11 @@ export async function GET(request: Request) {
         new Paragraph('Relatório gerado automaticamente pelo Sistema NAPED.')
       ] }] });
       const buffer = await Packer.toBuffer(doc);
-      const bytes = new Uint8Array(buffer);
-      return new NextResponse(bytes, { headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="relatorio-naped-${userId}.docx"`
-      }});
+      return binaryResponse(
+        Uint8Array.from(buffer),
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        `relatorio-naped-${userId}.docx`
+      );
     }
 
     const pdf = await PDFDocument.create();
@@ -104,10 +116,7 @@ export async function GET(request: Request) {
       y -= 5;
     }
     const bytes = await pdf.save();
-    return new NextResponse(bytes, { headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="relatorio-naped-${userId}.pdf"`
-    }});
+    return binaryResponse(bytes, 'application/pdf', `relatorio-naped-${userId}.pdf`);
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Erro ao gerar relatório.' }, { status: 500 });
   }
